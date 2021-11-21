@@ -9,6 +9,7 @@ import logging
 import numpy as np
 import tensorflow as tf
 import io
+import time
 
 
 # return list of labels
@@ -80,10 +81,13 @@ def training(config_path):
     # Epochs and validation set
     EPOCHS = config["params"]["epochs"] 
     VALIDATION_SET = (X_valid, y_valid_bin)
-
+    
+    start = time.time()
     history = new_model.fit(X_train, y_train_bin, epochs=EPOCHS, validation_data=VALIDATION_SET,
                         callbacks=CALLBACKS_LIST, verbose=2)
-    logging.info("********model is trained*********")
+    end = time.time()
+    total = start - end
+    logging.info(f"********model is trained in time: {total}********")
 
     # Fetching the path for the model and the plot
     artifacts_dir = config["artifacts"]["artifacts_dir"]
