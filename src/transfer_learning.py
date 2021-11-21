@@ -17,7 +17,7 @@ def training(config_path):
     dir2 = config["logs"]["general_logs"]
     general_logs = os.path.join(dir1, dir2) 
     os.makedirs(general_logs, exist_ok=True)
-    logging.basicConfig(filename=os.path.join(general_logs, 'logs.log'), level=logging.INFO, format=logging_str, filemode='a')
+    logging.basicConfig(filename=os.path.join(general_log, 'logs.log'), level=logging.INFO, format=logging_str, filemode='a')
 
     validation_datasize = config["params"]["validation_datasize"]
     (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = get_data(validation_datasize)

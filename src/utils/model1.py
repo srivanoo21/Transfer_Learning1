@@ -3,6 +3,7 @@ import time
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import io
 
 
 def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
@@ -27,7 +28,7 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
     model_clf.compile(loss=LOSS_FUNCTION,
                   optimizer=OPTIMIZER,
                   metrics=METRICS)
-                  
+
     # log our model summary information in logs
     def _log_model_summary(model):
         with io.StringIO() as stream:
@@ -36,7 +37,7 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
         return summary_str
 
     # model_clf.summary()
-    logging.info(f"base model summary: \n{_log_model_summary(model)}")
+    logging.info(f"transfer model summary: \n{_log_model_summary(model)}")
 
     return model_clf ## untrained model
 
