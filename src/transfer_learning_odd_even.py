@@ -1,6 +1,6 @@
 from src.utils.common import read_config
 from src.utils.data_mgmt import get_data
-from src.utils.model1 import create_model, save_model, save_plot
+from src.utils.model1 import create_model, save_plot
 from src.utils.callbacks import get_callbacks
 import argparse
 import os
@@ -68,7 +68,11 @@ def training(config_path):
     new_model.add(
         tf.keras.layers.Dense(2, activation="softmax", name="output_layer")
     )
-    logging.info(f"loaded new model summary: \n{_log_model_summary(new_model)}")
+     # Compile the model
+    new_model.compile(loss=LOSS_FUNCTION,
+                  optimizer=OPTIMIZER,
+                  metrics=METRICS)
+    logging.info(f"compiled new model")
 
     # Callbacks and Modelcheckpoint
     CALLBACKS_LIST = get_callbacks(config, X_train)  
@@ -86,14 +90,12 @@ def training(config_path):
     model_dir = config["artifacts"]["model_dir"]
     plot_dir = config["artifacts"]["plots_dir"]
 
-
     # saving the model
-    model_dir_path = os.path.join(artifacts_dir, model_dir)
-    os.makedirs(model_dir_path, exist_ok=True)
-    model_name = config["artifacts"]["new_model_name"]
-    save_model(model, model_name, model_dir_path)
-    logging.info(f"********model is saved at*********{model_dir_path}")
-    logging.info(f"********evaluation metrics *********{model.evaluate(X_test, y_test_bin)}")
+    new_model_path = os.path.join("artifacts", "model", "new_model.h5")
+    new_model.save(new_model_path)
+    logging.info(f"********new model is saved at*********{new_model_path}")
+    logging.info(f"********evaluation metrics *********{new_model.evaluate(X_test, y_test_bin)}")
+
 
     # saving the path
     plot_dir_path = os.path.join(artifacts_dir, plot_dir)
@@ -111,11 +113,10 @@ if __name__ == '__main__':
     args.add_argument("--config", "-c", default="config.yaml")
     parsed_args = args.parse_args()
 
+    training(config_path=parsed_args.config)
     try:
         logging.info("\n************************")
         logging.info(">>>>>>>training is going to be started <<<<<<<")
     except Exception as e:
         logging.exception(e)
         raise e
-
-    training(config_path=parsed_args.config)

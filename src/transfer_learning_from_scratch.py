@@ -1,12 +1,19 @@
 from src.utils.common import read_config
 from src.utils.data_mgmt import get_data
-from src.utils.model import create_model, save_model, save_plot
+from src.utils.model2 import create_model, save_model, save_plot
 from src.utils.callbacks import get_callbacks
 import argparse
 import os
 import pandas as pd
 import logging
+import numpy as np
 
+# return list of labels
+def update_even_odd_labels(list_of_labels):
+    for idx, label in enumerate(list_of_labels):
+        even_condition = label%2==0
+        list_of_labels[idx] = np.where(even_condition, 1, 0)
+    return list_of_labels
 
 def training(config_path):
     config = read_config(config_path)
@@ -17,27 +24,28 @@ def training(config_path):
     dir2 = config["logs"]["general_logs"]
     general_logs = os.path.join(dir1, dir2) 
     os.makedirs(general_logs, exist_ok=True)
-    logging.basicConfig(filename=os.path.join(general_logs, 'training_logs.log'), level=logging.INFO, format=logging_str, filemode='a')
+    logging.basicConfig(filename=os.path.join(general_logs, 'training_scratch_logs.log'), level=logging.INFO, format=logging_str, filemode='a')
 
     validation_datasize = config["params"]["validation_datasize"]
     (X_train, y_train), (X_valid, y_valid), (X_test, y_test) = get_data(validation_datasize)
 
+    y_train_bin, y_test_bin, y_valid_bin = update_even_odd_labels([y_train, y_test, y_valid]) 
 
     LOSS_FUNCTION = config["params"]["loss_function"]
     OPTIMIZER = config["params"]["optimizer"]
     METRICS = config["params"]["metrics"]
     NUM_CLASSES = config["params"]["num_classes"]
 
-    model = create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES)
+    scratch_model = create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES)
 
     # Callbacks and Modelcheckpoint
     CALLBACKS_LIST = get_callbacks(config, X_train)  
 
     # Epochs and validation set
     EPOCHS = config["params"]["epochs"] 
-    VALIDATION_SET = (X_valid, y_valid)
+    VALIDATION_SET = (X_valid, y_valid_bin)
 
-    history = model.fit(X_train, y_train, epochs=EPOCHS, validation_data=VALIDATION_SET,
+    history = scratch_model.fit(X_train, y_train_bin, epochs=EPOCHS, validation_data=VALIDATION_SET,
                         callbacks=CALLBACKS_LIST, verbose=2)
     logging.info("********model is trained*********")
 
@@ -50,10 +58,10 @@ def training(config_path):
     # saving the model
     model_dir_path = os.path.join(artifacts_dir, model_dir)
     os.makedirs(model_dir_path, exist_ok=True)
-    model_name = config["artifacts"]["model_name"]
-    save_model(model, model_name, model_dir_path)
+    model_name = config["artifacts"]["scratch_model_name"]
+    save_model(scratch_model, model_name, model_dir_path)
     logging.info(f"********model is saved at*********{model_dir_path}")
-    logging.info(f"********evaluation metrics *********{model.evaluate(X_test, y_test)}")
+    logging.info(f"********evaluation metrics *********{scratch_model.evaluate(X_test, y_test_bin)}")
 
     # saving the path
     plot_dir_path = os.path.join(artifacts_dir, plot_dir)
