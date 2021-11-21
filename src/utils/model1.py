@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+import logging
 
 
 def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
@@ -24,8 +25,8 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
             ]
 
     # Compile the model
-    model_clf = tf.keras.models.Sequential(LAYERS)
-    model_clf.compile(loss=LOSS_FUNCTION,
+    model = tf.keras.models.Sequential(LAYERS)
+    model.compile(loss=LOSS_FUNCTION,
                   optimizer=OPTIMIZER,
                   metrics=METRICS)
 
@@ -39,7 +40,7 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
     # model_clf.summary()
     logging.info(f"transfer model summary: \n{_log_model_summary(model)}")
 
-    return model_clf ## untrained model
+    return model ## untrained model
 
 
 def get_unique_filename(filename):

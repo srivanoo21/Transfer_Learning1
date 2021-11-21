@@ -3,6 +3,8 @@ import time
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
+import io
 
 
 def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
@@ -23,11 +25,12 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
             ]
 
     # Compile the model
-    model_clf = tf.keras.models.Sequential(LAYERS)
-    model_clf.compile(loss=LOSS_FUNCTION,
+    model = tf.keras.models.Sequential(LAYERS)
+    model.compile(loss=LOSS_FUNCTION,
                   optimizer=OPTIMIZER,
                   metrics=METRICS)
-                  
+    logging.info(">>>>>>>model is compiled <<<<<<<")
+
     # log our model summary information in logs
     def _log_model_summary(model):
         with io.StringIO() as stream:
@@ -38,7 +41,7 @@ def create_model(LOSS_FUNCTION, OPTIMIZER, METRICS, NUM_CLASSES):
     # model_clf.summary()
     logging.info(f"base model summary: \n{_log_model_summary(model)}")
 
-    return model_clf ## untrained model
+    return model ## untrained model
 
 
 def get_unique_filename(filename):
@@ -47,7 +50,8 @@ def get_unique_filename(filename):
 
 
 def save_model(model, model_name, model_dir):
-    unique_filename = get_unique_filename(model_name)
+    #unique_filename = get_unique_filename(model_name)
+    unique_filename = "model.h5"
     path_to_model = os.path.join(model_dir, unique_filename)
     model.save(path_to_model)
 
@@ -64,6 +68,6 @@ def get_log_path(log_name, logs_dir):
   uniqueName = get_unique_filename(log_name)
   logs_dir = os.path.join(logs_dir, log_name)
   log_path = os.path.join(logs_dir, uniqueName)
-  print(f"savings logs at: {log_path}")
+  logging.info(f"logs are saved at: {log_path}")
 
   return log_path
