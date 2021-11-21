@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-PROJECT_NAME = 'ANN-implementation'
+PROJECT_NAME = 'Transfer_Learning1'
 USER_NAME = 'srivanoo21'
 
 setuptools.setup(
@@ -11,7 +11,7 @@ setuptools.setup(
     version="0.0.1",
     author=USER_NAME,
     author_email="srivanoo21@gmail.com",
-    description="A small package for ANN implementation",
+    description="Transfer Learing practice 1",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url=f"https://github.com/{USER_NAME}/{PROJECT_NAME}",
